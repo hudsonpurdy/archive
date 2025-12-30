@@ -1,65 +1,147 @@
-import Image from "next/image";
+import { supabase } from '@/lib/supabase'
+import { ItemWithImages } from '@/types/archive'
+import Image from 'next/image'
+import Link from 'next/link'
 
-export default function Home() {
+export const revalidate = 0
+
+export default async function Home() {
+  const { data: items } = await supabase
+    .from('items')
+    .select(`
+      *,
+      images (*)
+    `)
+    .order('created_at', { ascending: false })
+    .order('display_order', { foreignTable: 'images', ascending: true })
+    .returns<ItemWithImages[]>()
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+              Archive Collection
+            </h1>
+            <Link
+              href="/items/new"
+              className="px-4 py-2 text-sm font-medium text-white bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Add Item
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {!items || items.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-zinc-500 dark:text-zinc-400">
+              No items in the collection yet.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item) => {
+              const primaryImage = item.images?.find(img => img.is_primary)
+              const firstImage = item.images?.[0]
+              const displayImage = primaryImage || firstImage
+
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-shadow"
+                >
+                  {displayImage ? (
+                    <div className="aspect-square bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden">
+                      <Image
+                        src={displayImage.url}
+                        alt={displayImage.alt_text || `${item.brand} ${item.item_name}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-square bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                      <div className="text-zinc-400 text-sm">No image</div>
+                    </div>
+                  )}
+
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                          {item.brand}
+                        </h2>
+                        <p className="text-zinc-600 dark:text-zinc-400">
+                          {item.item_name}
+                        </p>
+                      </div>
+                      {item.is_for_sale && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-md bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 text-xs font-medium">
+                          For Sale
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {item.season && (
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {item.season}
+                        </span>
+                      )}
+                      {item.year && (
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {item.year}
+                        </span>
+                      )}
+                      {item.size && (
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Size {item.size}
+                        </span>
+                      )}
+                      {item.condition && (
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 capitalize">
+                          {item.condition}
+                        </span>
+                      )}
+                    </div>
+
+                    {item.description && (
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-3">
+                        {item.description}
+                      </p>
+                    )}
+
+                    {item.tags && item.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {item.tags.map((tag, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {item.asking_price && (
+                      <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                        <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                          ${item.asking_price.toFixed(2)}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </main>
     </div>
-  );
+  )
 }
