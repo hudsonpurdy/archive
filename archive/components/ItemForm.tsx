@@ -18,22 +18,22 @@ export function ItemForm({ initialData, itemId }: ItemFormProps) {
   const [formData, setFormData] = useState<Partial<NewItem>>(initialData || {
     brand: '',
     item_name: '',
-    category: '',
-    season: '',
-    year: undefined,
-    style_code: '',
-    colorway: '',
-    size: '',
-    purchase_date: '',
-    purchase_price: undefined,
-    purchase_location: '',
-    condition: '',
-    description: '',
-    notes: '',
+    category: null,
+    season: null,
+    year: null,
+    style_code: null,
+    colorway: null,
+    size: null,
+    purchase_date: null,
+    purchase_price: null,
+    purchase_location: null,
+    condition: null,
+    description: null,
+    notes: null,
     tags: [],
     is_for_sale: false,
-    asking_price: undefined,
-    location: '',
+    asking_price: null,
+    location: null,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,9 +91,10 @@ export function ItemForm({ initialData, itemId }: ItemFormProps) {
 
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'number' ? (value ? parseFloat(value) : undefined) :
+      [name]: type === 'number' ? (value ? parseFloat(value) : null) :
               type === 'checkbox' ? (e.target as HTMLInputElement).checked :
-              value || undefined,
+              type === 'date' ? (value || null) :
+              value || null,
     }))
   }
 

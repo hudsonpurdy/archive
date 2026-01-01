@@ -24,12 +24,20 @@ export default async function Home() {
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
               Archive Collection
             </h1>
-            <Link
-              href="/items/new"
-              className="px-4 py-2 text-sm font-medium text-white bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-            >
-              Add Item
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm font-medium text-zinc-900 dark:text-zinc-50 border border-zinc-300 dark:border-zinc-700 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+              >
+                Login
+              </Link>
+              <Link
+                href="/items/new"
+                className="px-4 py-2 text-sm font-medium text-white bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+              >
+                Add Item
+              </Link>
+            </div>
           </div>
         </div>
       </header>

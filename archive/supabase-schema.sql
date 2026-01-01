@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS items (
   size TEXT,
 
   -- Acquisition Details
-  purchase_date DATE,
+  purchase_date TEXT,
   purchase_price DECIMAL(10, 2),
   purchase_location TEXT,
   condition TEXT, -- e.g., 'new', 'used-excellent', 'used-good', 'vintage'
