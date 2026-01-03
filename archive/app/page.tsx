@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { ItemWithImages } from '@/types/archive'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Header } from '@/components/Header'
 
 export const revalidate = 0
 
@@ -18,29 +18,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-              Archive Collection
-            </h1>
-            <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm font-medium text-zinc-900 dark:text-zinc-50 border border-zinc-300 dark:border-zinc-700 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-              >
-                Login
-              </Link>
-              <Link
-                href="/items/new"
-                className="px-4 py-2 text-sm font-medium text-white bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-              >
-                Add Item
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!items || items.length === 0 ? (

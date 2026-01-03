@@ -64,19 +64,29 @@ export function ItemForm({ initialData, itemId }: ItemFormProps) {
           .eq('id', itemId)
 
         if (updateError) throw updateError
+
+        setSaving(false)
+        router.push('/')
+        router.refresh()
       } else {
         // Create new item
-        const { error: insertError } = await supabase
+        const { data: newItem, error: insertError } = await supabase
           .from('items')
           .insert(submitData)
           .select()
           .single()
 
         if (insertError) throw insertError
-      }
 
-      router.push('/')
-      router.refresh()
+        if (!newItem) {
+          throw new Error('No item returned from insert')
+        }
+
+        setSaving(false)
+        // Redirect to edit page to upload images
+        router.push(`/items/${newItem.id}/edit`)
+        router.refresh()
+      }
     } catch (err) {
       console.error('Save error:', err)
       setError(err instanceof Error ? err.message : 'Failed to save item')
